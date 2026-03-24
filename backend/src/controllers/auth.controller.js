@@ -7,7 +7,7 @@ export const signup = async (req, res) => {
 
   try {
     if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All field are required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
     if (password.length < 6) {
       return res
@@ -32,8 +32,8 @@ export const signup = async (req, res) => {
       password: hashedPassword,
     });
     if (newUser) {
-      generateToken(newUser._id, res);
       await newUser.save();
+      generateToken(newUser._id, res);
 
       res.status(201).json({
         _id: newUser._id,
