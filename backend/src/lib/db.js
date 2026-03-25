@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+import { ENV } from "./env.js";
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URL);
+    const conn = await mongoose.connect(ENV.MONGO_URL);
     console.log("MONGO CONNECTED: ", conn.connection.host);
     return conn;
   } catch (error) {
@@ -12,7 +13,7 @@ export const connectDB = async () => {
         : "";
 
     console.error(
-      `Error connecting to MongoDB: ${error.message}${whitelistHint}`
+      `Error connecting to MongoDB: ${error.message}${whitelistHint}`,
     );
     throw error;
   }
