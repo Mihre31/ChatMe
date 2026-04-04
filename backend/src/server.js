@@ -7,12 +7,16 @@ import path from "path";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 import cookieParser from "cookie-parser";
-
+import cors from "cors";
 const app = express();
 
 const PORT = ENV.PORT || 3000;
 
 app.use(express.json()); //req.body
+if (!ENV.CLIENT_URL) {
+  throw new Error("CLIENT_URL environment variable is required");
+}
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 const __dirname = path.resolve();
