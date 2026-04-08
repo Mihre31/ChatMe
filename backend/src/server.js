@@ -12,11 +12,11 @@ const app = express();
 
 const PORT = ENV.PORT || 3000;
 
-app.use(express.json()); //req.body
 if (!ENV.CLIENT_URL) {
   throw new Error("CLIENT_URL environment variable is required");
 }
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(express.json({ limit: "10mb" })); // req.body
 app.use(cookieParser());
 
 const __dirname = path.resolve();

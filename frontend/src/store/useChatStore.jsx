@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
 export const useChatStore = create((set, get) => ({
-  allcontacts: [],
+  allContacts: [],
   chats: [],
   messages: [],
   activeTab: "chats",
@@ -23,7 +23,7 @@ export const useChatStore = create((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/contacts");
-      set({ allcontacts: res.data });
+      set({ allContacts: res.data });
     } catch (error) {
       toast.error(error?.response?.data?.message ?? "Failed to load contacts");
     } finally {
