@@ -12,16 +12,25 @@ const app = express();
 
 const PORT = ENV.PORT || 3000;
 
-app.use(express.json()); //req.body
 if (!ENV.CLIENT_URL) {
   throw new Error("CLIENT_URL environment variable is required");
 }
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(express.json({ limit: "10mb" })); // req.body
 app.use(cookieParser());
 
 const __dirname = path.resolve();
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+
+app.use((err, req, res, next) => {
+  if (err?.type === "entity.too.large") {
+    return res
+      .status(413)
+      .json({ message: "Payload too large. Max size is 10MB." });
+  }
+  return next(err);
+});
 
 //make ready to deployment
 if (ENV.NODE_ENV === "production") {
