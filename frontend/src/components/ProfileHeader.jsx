@@ -17,8 +17,12 @@ function ProfileHeader() {
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64Image = reader.result;
-      setSelectedImg(base64Image);
-      await updateProfile({ profilePic: base64Image });
+      try {
+        await updateProfile({ profilePic: base64Image });
+        setSelectedImg(base64Image);
+      } catch {
+        setSelectedImg(authUser?.profilePic ?? null);
+      }
     };
     reader.readAsDataURL(file);
   };

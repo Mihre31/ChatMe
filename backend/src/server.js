@@ -23,6 +23,15 @@ const __dirname = path.resolve();
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+app.use((err, req, res, next) => {
+  if (err?.type === "entity.too.large") {
+    return res
+      .status(413)
+      .json({ message: "Payload too large. Max size is 10MB." });
+  }
+  return next(err);
+});
+
 //make ready to deployment
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
