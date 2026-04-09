@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import ChatHeader from "./ChatHeader";
-import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceHolder";
+import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import MessagesLoadingSkeleton from "./MessageLoadingSkeleton";
 import MessageInput from "./MessageInput";
 
@@ -12,6 +12,7 @@ function ChatContainer() {
   const { authUser } = useAuthStore();
 
   useEffect(() => {
+    if (!selectedUser?._id) return;
     getMessagesByUserId(selectedUser._id);
   }, [selectedUser, getMessagesByUserId]);
   return (
@@ -36,7 +37,12 @@ function ChatContainer() {
                     />
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
-                  <p>{new Date(msg.createdAt).toISOString().slice(11, 16)}</p>
+                  <p>
+                    {new Intl.DateTimeFormat([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }).format(new Date(msg.createdAt))}
+                  </p>
                 </div>
               </div>
             ))}
