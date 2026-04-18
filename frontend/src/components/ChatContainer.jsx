@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import ChatHeader from "./ChatHeader";
@@ -10,11 +10,30 @@ function ChatContainer() {
   const { getMessagesByUserId, selectedUser, messages, isMessagesLoading } =
     useChatStore();
   const { authUser } = useAuthStore();
+  const messageEndref = useRef(null);
+
+  const formatMessageTime = (timestamp) => {
+    if (!timestamp) return "";
+
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return "";
+
+    return new Intl.DateTimeFormat([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
 
   useEffect(() => {
     if (!selectedUser?._id) return;
     getMessagesByUserId(selectedUser._id);
   }, [selectedUser, getMessagesByUserId]);
+
+  useEffect(() => {
+    if (messageEndref.current) {
+      messageEndref.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
   return (
     <>
       <ChatHeader />
@@ -37,15 +56,12 @@ function ChatContainer() {
                     />
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
-                  <p>
-                    {new Intl.DateTimeFormat([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(new Date(msg.createdAt))}
-                  </p>
+                  <p>{formatMessageTime(msg.createdAt)}</p>
                 </div>
               </div>
             ))}
+            {/*scroll target */}
+            <div ref={messageEndref} />
           </div>
         ) : isMessagesLoading ? (
           <MessagesLoadingSkeleton />
