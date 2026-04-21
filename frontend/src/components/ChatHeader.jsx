@@ -1,16 +1,18 @@
 import { X } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
-
+  const { onlineUsers } = useAuthStore();
+  const isOnline = onlineUsers.includes(selectedUser._id);
   if (!selectedUser) return null;
 
   return (
     <div className="flex items-center justify-between bg-slate-800/50 border-b border-slate-700/50 max-h-[84px] px-6 flex-1">
       {/* Left: User Info */}
       <div className="flex items-center gap-3">
-        <div className="avatar online">
+        <div className={`avatar ${isOnline ? "online" : "offline"}`}>
           <div className="w-10 rounded-full">
             <img
               src={selectedUser.profilePic || "/avatar.png"}
@@ -21,7 +23,11 @@ const ChatHeader = () => {
 
         <div>
           <h3 className="font-semibold text-sm">{selectedUser.fullName}</h3>
-          <p className="text-xs text-green-500">Online</p>
+          <p
+            className={`text-xs ${isOnline ? "text-green-500" : "text-stone-100"}`}
+          >
+            {isOnline ? "online" : "offline"}
+          </p>
         </div>
       </div>
 
