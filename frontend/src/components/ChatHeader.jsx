@@ -5,9 +5,9 @@ import { useAuthStore } from "../store/useAuthStore";
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
-  const isOnline = onlineUsers.includes(selectedUser._id);
-  if (!selectedUser) return null;
 
+  if (!selectedUser) return null;
+  const isOnline = onlineUsers.includes(selectedUser._id);
   return (
     <div className="flex items-center justify-between bg-slate-800/50 border-b border-slate-700/50 max-h-[84px] px-6 flex-1">
       {/* Left: User Info */}
