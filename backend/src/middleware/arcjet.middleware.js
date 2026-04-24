@@ -10,6 +10,10 @@ export const arcjectProtection = async (req, res, next) => {
         req.ip === "127.0.0.1" ||
         req.hostname === "localhost");
 
+    if (isLocalDev) {
+      return next();
+    }
+
     const decision = await aj.protect(req);
     if (decision.isDenied) {
       if (isLocalDev && decision.reason.isBot()) {

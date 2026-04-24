@@ -7,9 +7,15 @@ import MessagesLoadingSkeleton from "./MessageLoadingSkeleton";
 import MessageInput from "./MessageInput";
 
 function ChatContainer() {
-  const { getMessagesByUserId, selectedUser, messages, isMessagesLoading } =
-    useChatStore();
-  const { authUser } = useAuthStore();
+  const {
+    getMessagesByUserId,
+    selectedUser,
+    messages,
+    isMessagesLoading,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
+  const { authUser, socket } = useAuthStore();
   const messageEndref = useRef(null);
 
   const formatMessageTime = (timestamp) => {
@@ -27,13 +33,26 @@ function ChatContainer() {
   useEffect(() => {
     if (!selectedUser?._id) return;
     getMessagesByUserId(selectedUser._id);
-  }, [selectedUser, getMessagesByUserId]);
+    subscribeToMessages();
+
+    // clean up
+    return () => unsubscribeFromMessages();
+  }, [
+    selectedUser,
+    socket,
+    getMessagesByUserId,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndref.current) {
       messageEndref.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  if (!selectedUser || !authUser) return null;
+
   return (
     <>
       <ChatHeader />
@@ -43,10 +62,10 @@ function ChatContainer() {
             {messages.map((msg) => (
               <div
                 key={msg._id}
-                className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                className={`chat ${msg.senderId?.toString() === authUser._id?.toString() ? "chat-end" : "chat-start"}`}
               >
                 <div
-                  className={`chat-bubble relative ${msg.senderId === authUser._id ? "bg-cyan-600 text-white" : "bg-slate-800 text-slate-200"}`}
+                  className={`chat-bubble relative ${msg.senderId?.toString() === authUser._id?.toString() ? "bg-cyan-600 text-white" : "bg-slate-800 text-slate-200"}`}
                 >
                   {msg.image && (
                     <img

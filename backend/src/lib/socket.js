@@ -16,11 +16,16 @@ const io = new Server(server, {
 });
 
 io.use(socketAuthMiddleware);
-
 const userSocketMap = new Map(); // userId -> Set<socketId>
+
+// we will use this function to check if the user is online or not
+export function getReceiverSocketIds(userId) {
+  return Array.from(userSocketMap.get(userId?.toString()) ?? []);
+}
+
 io.on("connection", (socket) => {
   console.log("A user connected", socket.user.fullName);
-  const userId = socket.userId;
+  const userId = socket.userId.toString();
 
   if (!userSocketMap.has(userId)) userSocketMap.set(userId, new Set());
   userSocketMap.get(userId).add(socket.id);
