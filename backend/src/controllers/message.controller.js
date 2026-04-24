@@ -76,13 +76,16 @@ export const sendMessage = async (req, res) => {
     await newMessage.save();
 
     // todo:send message in real time if user is online
-    const receiverSocketIds = getReceiverSocketIds(receiverId);
 
-    if (receiverSocketIds.length > 0) {
-      receiverSocketIds.forEach((socketId) => {
-        io.to(socketId).emit("newMessage", newMessage);
-      });
-    }
+    const receiverSocketIds = getReceiverSocketIds(receiverId);
+    const senderSocketIds = getReceiverSocketIds(senderId);
+    const targetSocketIds = [
+      ...new Set([...receiverSocketIds, ...senderSocketIds]),
+    ];
+
+    targetSocketIds.forEach((socketId) => {
+      io.to(socketId).emit("newMessage", newMessage);
+    });
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in sendMessage controller", error.message);
@@ -106,7 +109,7 @@ export const getChatPartners = async (req, res) => {
             : msg.senderId.toString(),
         ),
       ),
-    ];
+    ].filter((partnerId) => partnerId !== loggedInUserId.toString());
     const chatPartners = await User.find({
       _id: { $in: chatPartnerIds },
     }).select("-password");

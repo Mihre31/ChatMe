@@ -14,6 +14,15 @@ export const useChatStore = create((set, get) => ({
   isMessagesLoading: false,
   isSoundEnabled: localStorage.getItem("isSoundEnabled") === "true",
 
+  resetChatState: () => {
+    set({
+      allContacts: [],
+      chats: [],
+      messages: [],
+      selectedUser: null,
+      activeTab: "chats",
+    });
+  },
   toggleSound: () => {
     localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
     set({ isSoundEnabled: !get().isSoundEnabled });
@@ -35,7 +44,12 @@ export const useChatStore = create((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/contacts");
-      set({ allContacts: res.data });
+      const authUserId = useAuthStore.getState().authUser?._id?.toString();
+      set({
+        allContacts: res.data.filter(
+          (contact) => contact._id?.toString() !== authUserId,
+        ),
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message ?? "Failed to load contacts");
     } finally {
@@ -46,7 +60,10 @@ export const useChatStore = create((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/chats");
-      set({ chats: res.data });
+      const authUserId = useAuthStore.getState().authUser?._id?.toString();
+      set({
+        chats: res.data.filter((chat) => chat._id?.toString() !== authUserId),
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message ?? "Failed to load chats");
     } finally {

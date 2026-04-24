@@ -7,6 +7,11 @@ const BASE_URL =
   import.meta.env.MODE === "development"
   ? "http://localhost:3000"
   : "/";
+
+const notifyAuthChange = () => {
+  localStorage.setItem("authEvent", Date.now().toString());
+};
+
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
@@ -34,6 +39,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
+      notifyAuthChange();
       toast.success("Account created successfully!");
       get().connectSocket();
     } catch (error) {
@@ -50,6 +56,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
+      notifyAuthChange();
       toast.success("Logged in successfully!");
       get().connectSocket();
     } catch (error) {
@@ -65,6 +72,7 @@ export const useAuthStore = create((set, get) => ({
       await axiosInstance.post("/auth/logout");
       get().disconnectSocket();
       set({ authUser: null });
+      notifyAuthChange();
       toast.success("Logged out successfully");
     } catch (error) {
       toast.error("Error logging out");

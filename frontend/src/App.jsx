@@ -4,15 +4,28 @@ import ChatPage from "./pages/ChatPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
 import { useAuthStore } from "./store/useAuthStore.js";
+import { useChatStore } from "./store/useChatStore.jsx";
 import PageLoader from "./components/PageLoader.jsx";
 import { Toaster } from "react-hot-toast";
 
 function App() {
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
+  const { resetChatState } = useChatStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    const handleAuthEvent = (event) => {
+      if (event.key !== "authEvent") return;
+      resetChatState();
+      checkAuth();
+    };
+
+    window.addEventListener("storage", handleAuthEvent);
+    return () => window.removeEventListener("storage", handleAuthEvent);
+  }, [checkAuth, resetChatState]);
 
   if (isCheckingAuth) return <PageLoader />;
   return (
